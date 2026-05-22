@@ -202,4 +202,11 @@ Este módulo gerencia o agendamento, diagnóstico e acompanhamento clínico real
   "veterinarianId": 1
 }
 ```
+### 🗄 Modelo En
+<div align="center">
+  <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150201.png" alt="Modelo de Gestão de Cuidados de Pets" width="200" />
+  <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150244.png" alt="Modelo de Gestão de Cuidados de Pets" width="305" />
+  <img src="doc/Pet%20Care%20Management%20Model-2026-05-18-150318.png" alt="Modelo de Gestão de Cuidados de Pets" width="215" />
+</div>
+
 
