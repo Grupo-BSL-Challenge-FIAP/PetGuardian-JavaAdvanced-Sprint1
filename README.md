@@ -19,6 +19,35 @@ http://localhost:8080/h2-console
 ```
 ---
 
+# Cronograma 
+
+| Atividade | Responsável | Data | Status |
+|--------|----------|------------|------------|
+| Implementação da entidade Account | Manuelalacerda | 13/05 |Concluído |
+| Configuração inicial do Swagger/OpenAPI | Manuelalacerda | 13/05 |Concluído |
+| Criação do README e guia de testes | Manuelalacerda | 13/05 |Concluído |
+| Implementação da entidade Responsible | Manuelalacerda | 13/05 |Concluído |
+| Ajustes de validações do AccountRequest | Manuelalacerda | 15/05 |Concluído |
+| Ajustes de validações do ResponsibleRequest | Manuelalacerda | 15/05 |Concluído |
+| Implementação da entidade Veterinarian | Manuelalacerda | 15/05 |Concluído |
+| Implementação da entidade Pet | Manuelalacerda | 15/05 |Concluído |
+| Ajustes e correções dos endpoints | Manuelalacerda | 15/05 |Concluído |
+| Implementação da entidade ClinicalHistory | Manuelalacerda | 15/05 |Concluído |
+| Documentação do módulo ClinicalHistory | Manuelalacerda | 15/05 |Concluído |
+| Implementação da entidade Alert | Manuelalacerda | 15/05 |Concluído |
+| Implementação da entidade Appointment | Manuelalacerda | 15/05 |Concluído |
+| Correção de paginação e cache do módulo Pet | Manuelalacerda | 18/05 |Concluído |
+| Correção de paginação e cache do módulo Responsible | Manuelalacerda | 18/05 |Concluído |
+| Configuração de cache na aplicação | Manuelalacerda | 18/05 |Concluído |
+| Ajustes do SwaggerConfig | Manuelalacerda | 18/05 |Concluído |
+| Correção dos HTTP Responses | Manuelalacerda | 18/05 |Concluído |
+| Organização de imagens e estrutura do projeto | Manuelalacerda | 21/05 |Concluído |
+| Atualizações da documentação README | Manuelalacerda | 21/05 |Concluído |
+| Adição da pasta de testes e exportação Postman | Manuelalacerda | 21/05 |Concluído |
+
+
+
+
 # 🔑 1. Accounts 
 
 Módulo base para autenticação e controle de perfis (`TUTOR`, `VETERINARIAN`, `ADMIN`).
