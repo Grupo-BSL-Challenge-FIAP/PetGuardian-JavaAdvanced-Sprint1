@@ -45,7 +45,43 @@ http://localhost:8080/h2-console
 | Atualizações da documentação README | Manuelalacerda | 21/05 |Concluído |
 | Adição da pasta de testes e exportação Postman | Manuelalacerda | 21/05 |Concluído |
 
+---
 
+## 👥 Integrantes do Grupo
+
+<table>
+  <tr>
+    <td width="130">
+      <img src="https://github.com/moisesBarsoti.png" width="120" style="border-radius: 50%;"/>
+    </td>
+    <td>
+      <b>Moisés Barsoti Andrade de Oliveira</b><br/>
+      <b>RM:</b> 565049 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPG - FIAP <br/>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="130">
+      <img src="https://github.com/sSofia-s.png" width="120" style="border-radius: 50%;"/>
+    </td>
+    <td>
+      <b>Sofia Siqueira Fontes</b><br/>
+      <b>RM:</b> 563829 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPG - FIAP <br/>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="130">
+      <img src="https://github.com/manuelalacerda.png" width="120" style="border-radius: 50%;"/>
+    </td>
+    <td>
+      <b>Manuela de Lacerda Soares</b><br/>
+      <b>RM:</b> 564887 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Turma:</b> 2TDSPG - FIAP <br/>
+    </td>
+  </tr>
+</table>
+
+---
 
 
 # 🔑 1. Accounts 
