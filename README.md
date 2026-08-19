@@ -9,6 +9,9 @@ O PetGuardian é uma plataforma de monitoramento inteligente para animais de est
 Acesse a documentação interativa e realize testes diretamente pelo navegador:
 
 ```bash
+https://petguardian-api-p2jq.onrender.com/swagger-ui/index.html#/
+```
+```bash
 http://localhost:8080/swagger-ui/index.html
 ```
 ```bash
