@@ -20,20 +20,35 @@ public class SecurityConfig {
 
     @Autowired
     private SecurityFilter securityFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        // Rotas públicas
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/error").permitAll()
+
+                        // Permissões de Pets
+                        .requestMatchers(HttpMethod.GET, "/pets/**").hasAnyRole("RESPONSIBLE", "VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
+
+                        // Permissões de Consultas (Appointments)
+                        .requestMatchers(HttpMethod.GET, "/appointments/**").hasAnyRole("RESPONSIBLE", "VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
+
+                        // Qualquer outra requisição precisa apenas estar autenticada
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Permite o H2 Console
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
