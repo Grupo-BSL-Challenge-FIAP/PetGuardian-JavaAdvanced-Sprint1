@@ -1,6 +1,7 @@
 package br.com.clyvo.petguardian.controller;
 
 import br.com.clyvo.petguardian.dto.request.LoginRequest;
+import br.com.clyvo.petguardian.dto.request.RegisterRequest;
 import br.com.clyvo.petguardian.dto.response.LoginResponse;
 import br.com.clyvo.petguardian.dto.request.MobileRegisterRequest;
 import br.com.clyvo.petguardian.entity.Account;
@@ -48,6 +49,26 @@ public class AuthController {
         var token = tokenService.generateToken(account);
 
         return ResponseEntity.ok(new LoginResponse(token, account.getId(), account.getRole()));
+    }
+
+    @PostMapping("/register/vet")
+    public ResponseEntity<Void> registerVet(@RequestBody @Valid RegisterRequest data) {
+        if (this.accountRepository.findByEmail(data.email()) != null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        Account newAccount = Account.builder()
+                .email(data.email())
+                .password(encryptedPassword)
+                .role(data.role())
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        this.accountRepository.save(newAccount);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register")

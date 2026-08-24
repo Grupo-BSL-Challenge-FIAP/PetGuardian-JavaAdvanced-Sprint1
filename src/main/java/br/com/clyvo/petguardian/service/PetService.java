@@ -61,6 +61,14 @@ public class PetService {
         return toResponse(pet);
     }
 
+    public Page<PetResponse> findMyPets(Long accountId, Pageable pageable) {
+        Responsible responsible = responsibleRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Responsável não encontrado para esta conta"));
+
+        return repository.findByResponsibleId(responsible.getId(), pageable)
+                .map(this::toResponse);
+    }
+
 
     public Page<PetResponse> findByName(String name, Pageable pageable) {
         return repository.findByNameContainingIgnoreCase(name, pageable).map(this::toResponse);

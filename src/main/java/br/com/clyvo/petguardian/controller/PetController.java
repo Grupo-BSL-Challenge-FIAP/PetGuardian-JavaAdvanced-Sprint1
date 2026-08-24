@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.clyvo.petguardian.entity.Account;
 
 @RestController
 @RequestMapping("pets")
@@ -74,4 +76,13 @@ public class PetController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/my-pets")
+    @Operation(summary = "Lista todos os pets do responsável autenticado")
+    public ResponseEntity<Page<PetResponse>> findMyPets(
+            @AuthenticationPrincipal Account account,
+            Pageable pageable) {
+        return ResponseEntity.ok(service.findMyPets(account.getId(), pageable));
+    }
+
 }
