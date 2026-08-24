@@ -3,6 +3,7 @@ package br.com.clyvo.petguardian.controller;
 import br.com.clyvo.petguardian.dto.request.AppointmentRequest;
 import br.com.clyvo.petguardian.dto.response.AppointmentResponse;
 import br.com.clyvo.petguardian.service.AppointmentService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("appointments")
@@ -28,6 +31,12 @@ public class AppointmentController {
     public ResponseEntity<AppointmentResponse> getById(@PathVariable Long id) {
         AppointmentResponse response = service.findById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/pet/{petId}")
+    @Operation(summary = "Lista todas as consultas de um pet específico")
+    public ResponseEntity<List<AppointmentResponse>> findByPetId(@PathVariable Long petId) {
+        return ResponseEntity.ok(service.findByPetId(petId));
     }
 
     @GetMapping
