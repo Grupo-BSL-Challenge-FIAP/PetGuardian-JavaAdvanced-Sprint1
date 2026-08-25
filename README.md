@@ -20,6 +20,9 @@ http://localhost:8080/api-docs
 ```bash
 http://localhost:8080/h2-console
 ```
+```bash
+http://localhost:8080
+```
 ---
 
 # Cronograma 
