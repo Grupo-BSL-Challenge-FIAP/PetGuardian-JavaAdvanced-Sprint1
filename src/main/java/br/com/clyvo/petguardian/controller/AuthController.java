@@ -3,6 +3,7 @@ package br.com.clyvo.petguardian.controller;
 import br.com.clyvo.petguardian.dto.request.LoginRequest;
 import br.com.clyvo.petguardian.dto.request.RegisterRequest;
 import br.com.clyvo.petguardian.dto.response.LoginResponse;
+import br.com.clyvo.petguardian.dto.response.MeResponse;
 import br.com.clyvo.petguardian.dto.request.MobileRegisterRequest;
 import br.com.clyvo.petguardian.entity.Account;
 import br.com.clyvo.petguardian.entity.Responsible;
@@ -16,12 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
@@ -40,6 +39,7 @@ public class AuthController {
     @Autowired
     private ResponsibleRepository responsibleRepository;
 
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
@@ -49,6 +49,28 @@ public class AuthController {
         var token = tokenService.generateToken(account);
 
         return ResponseEntity.ok(new LoginResponse(token, account.getId(), account.getRole()));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<MeResponse> getCurrentUser(@AuthenticationPrincipal Account account) {
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long responsibleId = null;
+        Responsible responsible = responsibleRepository.findByAccountId(account.getId()).orElse(null);
+        if (responsible != null) {
+            responsibleId = responsible.getId();
+        }
+
+        MeResponse response = new MeResponse(
+                account.getId(),
+                account.getEmail(),
+                account.getRole(),
+                responsibleId
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register/vet")
@@ -78,7 +100,6 @@ public class AuthController {
         if (this.accountRepository.findByEmail(data.email()) != null) {
             return ResponseEntity.badRequest().build();
         }
-
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         Account newAccount = Account.builder()
