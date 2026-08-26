@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.clyvo</groupId>
-	<artifactId>petguardian</artifactId>
+	<artifactId>vitalia</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>petguardian</name>
+	<name>vitalia</name>
 	<description/>
 	<url/>
 	<licenses>
