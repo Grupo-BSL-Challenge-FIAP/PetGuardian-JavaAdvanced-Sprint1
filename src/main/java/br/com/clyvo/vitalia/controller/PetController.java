@@ -1,0 +1,88 @@
+package br.com.clyvo.vitalia.controller;
+
+import br.com.clyvo.vitalia.dto.request.PetRequest;
+import br.com.clyvo.vitalia.dto.response.PetResponse;
+import br.com.clyvo.vitalia.enums.CurrentStatus;
+import br.com.clyvo.vitalia.service.PetService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import br.com.clyvo.vitalia.entity.Account;
+
+@RestController
+@RequestMapping("pets")
+@RequiredArgsConstructor
+@Tag(name = "Pets", description = "Gerenciamento dos pets cadastrados no sistema")
+public class PetController {
+
+    private final PetService service;
+
+    @PostMapping
+    @Operation(summary = "Cadastra um novo pet")
+    public ResponseEntity<PetResponse> create(@RequestBody @Valid PetRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista todos os pets com paginação e ordenação")
+    public ResponseEntity<Page<PetResponse>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Busca um pet pelo ID")
+    public ResponseEntity<PetResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/search/name")
+    @Operation(summary = "Busca pets por nome (parcial, sem distinção de maiúsculas)")
+    public ResponseEntity<Page<PetResponse>> findByName(
+            @RequestParam String name, Pageable pageable) {
+        return ResponseEntity.ok(service.findByName(name, pageable));
+    }
+
+    @GetMapping("/search/species")
+    @Operation(summary = "Busca pets por espécie")
+    public ResponseEntity<Page<PetResponse>> findBySpecies(
+            @RequestParam String species, Pageable pageable) {
+        return ResponseEntity.ok(service.findBySpecies(species, pageable));
+    }
+
+    @GetMapping("/search/status")
+    @Operation(summary = "Busca pets por status de saúde (NORMAL, ATTENTION, CRITICAL)")
+    public ResponseEntity<Page<PetResponse>> findByStatus(
+            @RequestParam CurrentStatus status, Pageable pageable) {
+        return ResponseEntity.ok(service.findByStatus(status, pageable));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza os dados de um pet")
+    public ResponseEntity<PetResponse> update(
+            @PathVariable Long id, @RequestBody @Valid PetRequest request) {
+        return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Remove um pet do sistema")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/my-pets")
+    @Operation(summary = "Lista todos os pets do responsável autenticado")
+    public ResponseEntity<Page<PetResponse>> findMyPets(
+            @AuthenticationPrincipal Account account,
+            Pageable pageable) {
+        return ResponseEntity.ok(service.findMyPets(account.getId(), pageable));
+    }
+
+}
