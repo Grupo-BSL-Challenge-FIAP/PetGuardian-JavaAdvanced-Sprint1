@@ -2,7 +2,7 @@ package br.com.clyvo.vitalia.controller;
 
 import br.com.clyvo.vitalia.dto.request.PetRequest;
 import br.com.clyvo.vitalia.dto.response.PetResponse;
-import br.com.clyvo.vitalia.entity.Account;
+import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,7 +65,7 @@ public class PetController {
     @GetMapping("/my-pets")
     @Operation(summary = "Lista todos os pets do tutor autenticado")
     public ResponseEntity<Page<PetResponse>> findMyPets(
-            @AuthenticationPrincipal Account account,
+            @AuthenticationPrincipal AppUser account,
             Pageable pageable) {
         return ResponseEntity.ok(service.findMyPets(account.getId(), pageable));
     }

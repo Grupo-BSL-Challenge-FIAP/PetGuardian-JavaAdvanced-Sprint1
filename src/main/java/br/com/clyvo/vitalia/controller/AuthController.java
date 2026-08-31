@@ -5,12 +5,12 @@ import br.com.clyvo.vitalia.dto.request.RegisterRequest;
 import br.com.clyvo.vitalia.dto.response.LoginResponse;
 import br.com.clyvo.vitalia.dto.response.MeResponse;
 import br.com.clyvo.vitalia.dto.request.MobileRegisterRequest;
-import br.com.clyvo.vitalia.entity.Account;
-import br.com.clyvo.vitalia.enums.Role;
-import br.com.clyvo.vitalia.repository.AccountRepository;
+import br.com.clyvo.vitalia.entity.AppUser;
+import br.com.clyvo.vitalia.enums.AppUserStatus;
+import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.service.TokenService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,38 +24,34 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+    private final AppUserRepository appUserRepository;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        var account = (Account) auth.getPrincipal();
-        var token = tokenService.generateToken(account);
+        var user = (AppUser) auth.getPrincipal();
+        var token = tokenService.generateToken(user);
 
-        return ResponseEntity.ok(new LoginResponse(token, account.getId(), account.getRole()));
+        return ResponseEntity.ok(new LoginResponse(token, user.getId(), user.getRoles()));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<MeResponse> getCurrentUser(@AuthenticationPrincipal Account account) {
-        if (account == null) {
+    public ResponseEntity<MeResponse> getCurrentUser(@AuthenticationPrincipal AppUser user) {
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         MeResponse response = new MeResponse(
-                account.getId(),
-                account.getEmail(),
-                account.getRole()
+                user.getId(),
+                user.getEmail(),
+                user.getRoles()
         );
 
         return ResponseEntity.ok(response);
@@ -63,23 +59,22 @@ public class AuthController {
 
     @PostMapping("/register/vet")
     public ResponseEntity<Void> registerVet(@RequestBody @Valid RegisterRequest data) {
-        if (this.accountRepository.findByEmail(data.email()) != null) {
+        if (this.appUserRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         LocalDateTime now = LocalDateTime.now();
-        Account newAccount = Account.builder()
+        AppUser newUser = AppUser.builder()
                 .fullName(data.fullName())
                 .email(data.email())
-                .password(encryptedPassword)
-                .status("ACTIVE")
-                .role(data.role())
+                .passwordHash(encryptedPassword)
+                .status(AppUserStatus.ACTIVE)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
 
-        this.accountRepository.save(newAccount);
+        this.appUserRepository.save(newUser);
 
         return ResponseEntity.ok().build();
     }
@@ -88,24 +83,23 @@ public class AuthController {
     @Transactional
     public ResponseEntity<Void> register(@RequestBody @Valid MobileRegisterRequest data) {
 
-        if (this.accountRepository.findByEmail(data.email()) != null) {
+        if (this.appUserRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         LocalDateTime now = LocalDateTime.now();
-        Account newAccount = Account.builder()
+        AppUser newUser = AppUser.builder()
                 .fullName(data.fullName())
                 .email(data.email())
-                .password(encryptedPassword)
+                .passwordHash(encryptedPassword)
                 .phone(data.phoneNumber())
-                .status("ACTIVE")
-                .role(Role.TUTOR)
+                .status(AppUserStatus.ACTIVE)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
 
-        this.accountRepository.save(newAccount);
+        this.appUserRepository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

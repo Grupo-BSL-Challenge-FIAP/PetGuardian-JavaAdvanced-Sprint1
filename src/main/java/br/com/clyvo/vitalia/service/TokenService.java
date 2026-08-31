@@ -1,6 +1,6 @@
 package br.com.clyvo.vitalia.service;
 
-import br.com.clyvo.vitalia.entity.Account;
+import br.com.clyvo.vitalia.entity.AppUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -18,7 +18,7 @@ public class TokenService {
     @Value("${api.security.token.secret:my-secret-key}")
     private String secret;
 
-    public String generateToken(Account account) {
+    public String generateToken(AppUser account) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
