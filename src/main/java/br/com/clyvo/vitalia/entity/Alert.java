@@ -1,36 +1,44 @@
 package br.com.clyvo.vitalia.entity;
 
-import br.com.clyvo.vitalia.enums.*;
 import jakarta.persistence.*;
-import lombok.*; // Garanta que este import existe
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Data // <-- ESSA ANOTAÇÃO GERA OS GETTERS (getId, getType, etc)
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "alerts")
+@Table(name = "TB_VITALIA_HEALTH_ALERT")
 public class Alert {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ALERT_ID")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private AlertType type;
+    @Column(name = "PET_ID", nullable = false)
+    private Long petId;
 
+    @Column(name = "MEASUREMENT_ID")
+    private Long measurementId;
+
+    @Column(name = "ALERT_TYPE", nullable = false, length = 50)
+    private String alertType;
+
+    @Column(name = "SEVERITY", nullable = false, length = 20)
+    private String severity;
+
+    @Column(name = "MESSAGE", nullable = false, length = 2000)
     private String message;
 
-    @Enumerated(EnumType.STRING)
-    private RiskLevel riskLevel;
+    @Column(name = "STATUS", nullable = false, length = 20)
+    private String status;
 
-    @Enumerated(EnumType.STRING)
-    private AlertStatus status;
-
+    @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
-    private LocalDateTime resolvedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "pet_id")
-    private Pet pet;
+    @Column(name = "RESOLVED_AT")
+    private LocalDateTime resolvedAt;
 }
