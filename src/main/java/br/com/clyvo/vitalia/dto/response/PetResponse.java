@@ -1,16 +1,15 @@
 package br.com.clyvo.vitalia.dto.response;
 
-import br.com.clyvo.vitalia.enums.CurrentStatus;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record PetResponse(
         Long id,
         String name,
-        String species,
-        String breed,
+        String sex,
         LocalDate birthDate,
-        Double weight,
-        CurrentStatus currentStatus,
-        String responsibleName,
-        String veterinarianName
+        BigDecimal weightKg,
+        String status,
+        Long ownerUserId,
+        Long breedId
 ) {}
