@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ClinicalHistoryRepository extends JpaRepository<ClinicalHistory, Long> {
-    List<ClinicalHistory> findByPetIdOrderByRecordedAtDesc(Long petId);
+    List<ClinicalHistory> findByPetIdOrderByRecordDateDesc(Long petId);
 }
