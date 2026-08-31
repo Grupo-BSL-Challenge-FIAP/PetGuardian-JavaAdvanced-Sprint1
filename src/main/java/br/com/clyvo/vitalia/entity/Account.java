@@ -19,25 +19,38 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts")
+@Table(name = "TB_VITALIA_APP_USER")
 public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USER_ID")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "FULL_NAME", nullable = false, length = 150)
+    private String fullName;
+
+    @Column(name = "EMAIL", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "PASSWORD_HASH", nullable = false, length = 255)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "PHONE", length = 30)
+    private String phone;
 
-    private Boolean active;
+    @Column(name = "STATUS", nullable = false, length = 20)
+    private String status;
 
+    @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "UPDATED_AT", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Transient
+    @Builder.Default
+    private Role role = Role.TUTOR;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -53,11 +66,11 @@ public class Account implements UserDetails {
     public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() { return !"BLOCKED".equals(status); }
 
     @Override
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() { return this.active != null ? this.active : true; }
+    public boolean isEnabled() { return "ACTIVE".equals(status); }
 }
