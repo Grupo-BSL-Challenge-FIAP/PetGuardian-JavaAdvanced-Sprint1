@@ -3,7 +3,6 @@ package br.com.clyvo.vitalia.service;
 import br.com.clyvo.vitalia.dto.request.ClinicalHistoryRequest;
 import br.com.clyvo.vitalia.dto.response.ClinicalHistoryResponse;
 import br.com.clyvo.vitalia.entity.ClinicalHistory;
-import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.ClinicalHistoryRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,17 +24,18 @@ public class ClinicalHistoryService {
     private final PetRepository petRepository;
 
     public ClinicalHistoryResponse create(ClinicalHistoryRequest request) {
-        Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+        if (!petRepository.existsById(request.petId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
+        }
 
         ClinicalHistory history = ClinicalHistory.builder()
-                .temperature(request.temperature())
-                .heartRate(request.heartRate())
-                .activityLevel(request.activityLevel())
-                .healthScore(request.healthScore())
-                .description(request.description())
+                .petId(request.petId())
+                .veterinarianId(request.veterinarianId())
+                .appointmentId(request.appointmentId())
+                .diagnosis(request.diagnosis())
                 .observations(request.observations())
-                .pet(pet)
+                .treatment(request.treatment())
+                .recordDate(LocalDateTime.now())
                 .build();
 
         return toResponse(repository.save(history));
@@ -51,7 +52,7 @@ public class ClinicalHistoryService {
     }
 
     public List<ClinicalHistoryResponse> findByPet(Long petId) {
-        return repository.findByPetIdOrderByRecordedAtDesc(petId)
+        return repository.findByPetIdOrderByRecordDateDesc(petId)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -61,16 +62,11 @@ public class ClinicalHistoryService {
         ClinicalHistory history = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado"));
 
-        Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
-
-        history.setTemperature(request.temperature());
-        history.setHeartRate(request.heartRate());
-        history.setActivityLevel(request.activityLevel());
-        history.setHealthScore(request.healthScore());
-        history.setDescription(request.description());
+        history.setVeterinarianId(request.veterinarianId());
+        history.setAppointmentId(request.appointmentId());
+        history.setDiagnosis(request.diagnosis());
         history.setObservations(request.observations());
-        history.setPet(pet);
+        history.setTreatment(request.treatment());
 
         return toResponse(repository.save(history));
     }
@@ -85,14 +81,13 @@ public class ClinicalHistoryService {
     private ClinicalHistoryResponse toResponse(ClinicalHistory history) {
         return new ClinicalHistoryResponse(
                 history.getId(),
-                history.getTemperature(),
-                history.getHeartRate(),
-                history.getActivityLevel(),
-                history.getHealthScore(),
-                history.getDescription(),
+                history.getPetId(),
+                history.getVeterinarianId(),
+                history.getAppointmentId(),
+                history.getRecordDate(),
+                history.getDiagnosis(),
                 history.getObservations(),
-                history.getRecordedAt(),
-                history.getPet().getName()
+                history.getTreatment()
         );
     }
 }
