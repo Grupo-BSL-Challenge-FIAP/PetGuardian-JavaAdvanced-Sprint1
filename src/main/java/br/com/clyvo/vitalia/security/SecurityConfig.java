@@ -42,7 +42,7 @@ public class SecurityConfig {
 
                         // Permissões de Consultas (Appointments)
                         .requestMatchers(HttpMethod.GET, "/appointments/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/appointments/**").hasAnyRole("TUTOR","VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
 
