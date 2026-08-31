@@ -5,6 +5,5 @@ import br.com.clyvo.vitalia.enums.Role;
 public record MeResponse(
         Long accountId,
         String email,
-        Role role,
-        Long responsibleId
+        Role role
 ) {}
