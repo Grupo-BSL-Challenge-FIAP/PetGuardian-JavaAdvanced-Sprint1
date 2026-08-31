@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,6 +24,7 @@ public class AlertService {
 
     private final AlertRepository repository;
     private final PetRepository petRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public AlertResponse create(AlertRequest request) {
         Pet pet = petRepository.findById(request.petId())
@@ -37,7 +39,13 @@ public class AlertService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return toResponse(repository.save(alert));
+        Alert savedAlert = repository.save(alert);
+        AlertResponse response = toResponse(savedAlert);
+
+        // Dispara o alerta em tempo real para quem estiver conectado no canal WebSocket
+        messagingTemplate.convertAndSend("/topic/alerts", response);
+
+        return response;
     }
 
     public Page<AlertResponse> findAll(Pageable pageable) {
