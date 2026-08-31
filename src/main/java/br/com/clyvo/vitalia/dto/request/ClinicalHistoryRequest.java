@@ -1,25 +1,19 @@
 package br.com.clyvo.vitalia.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 
 public record ClinicalHistoryRequest(
+        @NotNull(message = "O ID do pet é obrigatório")
+        Long petId,
 
-        @NotNull
-        Double temperature,
+        @NotNull(message = "O ID do veterinário é obrigatório")
+        Long veterinarianId,
 
-        @NotNull
-        Integer heartRate,
+        Long appointmentId,
 
-        @NotBlank
-        String activityLevel,
-
-        @Min(0) @Max(100)
-        Double healthScore,
-
-        String description,
+        String diagnosis,
 
         String observations,
 
-        @NotNull
-        Long petId
+        String treatment
 ) {}
