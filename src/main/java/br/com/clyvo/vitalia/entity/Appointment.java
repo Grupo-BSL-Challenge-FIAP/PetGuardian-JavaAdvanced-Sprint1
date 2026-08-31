@@ -1,8 +1,8 @@
 package br.com.clyvo.vitalia.entity;
 
-import br.com.clyvo.vitalia.enums.AppointmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,41 +10,26 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "appointments")
+@Table(name = "TB_VITALIA_APPOINTMENT")
 public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "APPOINTMENT_ID")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "PET_ID", nullable = false)
+    private Long petId;
+
+    @Column(name = "VETERINARIAN_ID", nullable = false)
+    private Long veterinarianId;
+
+    @Column(name = "APPOINTMENT_DATE", nullable = false)
     private LocalDateTime appointmentDate;
 
-    @Column(nullable = false)
-    private String reason;
+    @Column(name = "STATUS", nullable = false, length = 30)
+    private String status;
 
-    @Column(columnDefinition = "TEXT")
-    private String diagnosis;
-
-    @Column(columnDefinition = "TEXT")
-    private String recommendation;
-
-    @Enumerated(EnumType.STRING)
-    private AppointmentStatus status;
-
-    private LocalDateTime createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_id", nullable = false)
-    private Pet pet;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "veterinarian_id", nullable = false)
-    private Veterinarian veterinarian;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        if (this.status == null) this.status = AppointmentStatus.SCHEDULED;
-    }
+    @Column(name = "NOTES", length = 1000)
+    private String notes;
 }
