@@ -35,13 +35,13 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
 
                         // Permissões de Pets
-                        .requestMatchers(HttpMethod.GET, "/pets/**").hasAnyRole("RESPONSIBLE", "VETERINARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/pets/**").hasAnyRole("RESPONSIBLE", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/pets/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/pets/**").hasAnyRole("TUTOR", "ADMIN")
 
                         // Permissões de Consultas (Appointments)
-                        .requestMatchers(HttpMethod.GET, "/appointments/**").hasAnyRole("RESPONSIBLE", "VETERINARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/appointments/**").hasAnyRole("TUTOR", "VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("VETERINARIAN", "ADMIN")
