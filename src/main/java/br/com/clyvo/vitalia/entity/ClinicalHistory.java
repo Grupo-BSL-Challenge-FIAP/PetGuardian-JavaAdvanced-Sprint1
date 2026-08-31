@@ -2,6 +2,7 @@ package br.com.clyvo.vitalia.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,32 +10,32 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "clinical_histories")
+@Table(name = "TB_VITALIA_CLINICAL_RECORD")
 public class ClinicalHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CLINICAL_RECORD_ID")
     private Long id;
 
-    private Double temperature;
-    private Integer heartRate;
-    private String activityLevel;
-    private Double healthScore;
+    @Column(name = "PET_ID", nullable = false)
+    private Long petId;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "VETERINARIAN_ID", nullable = false)
+    private Long veterinarianId;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "APPOINTMENT_ID")
+    private Long appointmentId;
+
+    @Column(name = "RECORD_DATE", nullable = false)
+    private LocalDateTime recordDate;
+
+    @Column(name = "DIAGNOSIS", length = 1000)
+    private String diagnosis;
+
+    @Column(name = "OBSERVATIONS", length = 2000)
     private String observations;
 
-    private LocalDateTime recordedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "pet_id")
-    private Pet pet;
-
-    @PrePersist
-    protected void onCreate() {
-        recordedAt = LocalDateTime.now();
-    }
+    @Column(name = "TREATMENT", length = 2000)
+    private String treatment;
 }
