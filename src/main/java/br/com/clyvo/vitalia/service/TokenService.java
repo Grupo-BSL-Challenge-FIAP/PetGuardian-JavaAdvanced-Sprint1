@@ -15,19 +15,20 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    @Value("${api.security.token.secret:my-secret-key}")
+    @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(AppUser account) {
+    public String generateToken(AppUser user) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                    .withIssuer("petguardian-api")
-                    .withSubject(account.getEmail())
+                    .withIssuer("vitalia-api")
+                    .withSubject(user.getEmail())
+                    .withClaim("roles", user.getRoles().stream().map(role -> role.getName()).toList())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro enquanto gerava o token", exception);
+            throw new RuntimeException("Erro enquanto gerava o token JWT", exception);
         }
     }
 
@@ -35,7 +36,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("petguardian-api")
+                    .withIssuer("vitalia-api")
                     .build()
                     .verify(token)
                     .getSubject();
