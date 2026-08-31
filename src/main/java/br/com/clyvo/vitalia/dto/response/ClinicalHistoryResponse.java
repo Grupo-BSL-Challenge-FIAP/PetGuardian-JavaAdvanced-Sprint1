@@ -4,12 +4,11 @@ import java.time.LocalDateTime;
 
 public record ClinicalHistoryResponse(
         Long id,
-        Double temperature,
-        Integer heartRate,
-        String activityLevel,
-        Double healthScore,
-        String description,
+        Long petId,
+        Long veterinarianId,
+        Long appointmentId,
+        LocalDateTime recordDate,
+        String diagnosis,
         String observations,
-        LocalDateTime recordedAt,
-        String petName
+        String treatment
 ) {}
