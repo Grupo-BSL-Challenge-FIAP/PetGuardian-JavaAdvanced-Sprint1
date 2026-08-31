@@ -40,7 +40,7 @@ public class ClinicalHistoryController {
 
     @GetMapping("/pet/{petId}")
     public ResponseEntity<List<ClinicalHistoryResponse>> getByPet(@PathVariable Long petId) {
-        List<ClinicalHistoryResponse> response = service.findByPet(petId);
+        List<ClinicalHistoryResponse> response = service.findByPetId(petId);
         return ResponseEntity.ok(response);
     }
 

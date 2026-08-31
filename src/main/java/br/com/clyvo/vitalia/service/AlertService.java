@@ -3,6 +3,7 @@ package br.com.clyvo.vitalia.service;
 import br.com.clyvo.vitalia.dto.request.AlertRequest;
 import br.com.clyvo.vitalia.dto.response.AlertResponse;
 import br.com.clyvo.vitalia.entity.Alert;
+import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.AlertRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,11 @@ public class AlertService {
     private final PetRepository petRepository;
 
     public AlertResponse create(AlertRequest request) {
-        if (!petRepository.existsById(request.petId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
-        }
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
 
         Alert alert = Alert.builder()
-                .petId(request.petId())
+                .pet(pet)
                 .alertType(request.alertType())
                 .message(request.message())
                 .severity(request.severity())
@@ -51,6 +51,10 @@ public class AlertService {
     }
 
     public List<AlertResponse> findByPet(Long petId) {
+        if (!petRepository.existsById(petId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
+        }
+
         return repository.findByPetIdOrderByCreatedAtDesc(petId)
                 .stream()
                 .map(this::toResponse)
@@ -61,10 +65,13 @@ public class AlertService {
         Alert alert = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alerta não encontrado"));
 
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        alert.setPet(pet);
         alert.setAlertType(request.alertType());
         alert.setMessage(request.message());
         alert.setSeverity(request.severity());
-        alert.setPetId(request.petId());
 
         if ("RESOLVED".equals(request.status()) && !"RESOLVED".equals(alert.getStatus())) {
             alert.setResolvedAt(LocalDateTime.now());
@@ -92,7 +99,7 @@ public class AlertService {
                 alert.getStatus(),
                 alert.getCreatedAt(),
                 alert.getResolvedAt(),
-                alert.getPetId()
+                alert.getPet() != null ? alert.getPet().getId() : null
         );
     }
 }

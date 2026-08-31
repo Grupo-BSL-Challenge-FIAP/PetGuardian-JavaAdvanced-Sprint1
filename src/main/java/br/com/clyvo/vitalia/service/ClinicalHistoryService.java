@@ -2,9 +2,14 @@ package br.com.clyvo.vitalia.service;
 
 import br.com.clyvo.vitalia.dto.request.ClinicalHistoryRequest;
 import br.com.clyvo.vitalia.dto.response.ClinicalHistoryResponse;
+import br.com.clyvo.vitalia.entity.AppUser;
+import br.com.clyvo.vitalia.entity.Appointment;
 import br.com.clyvo.vitalia.entity.ClinicalHistory;
+import br.com.clyvo.vitalia.entity.Pet;
+import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.ClinicalHistoryRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
+import br.com.clyvo.vitalia.repository.AppUserRepository; // Verifique o nome correto do seu repositório de usuário se necessário
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +26,31 @@ public class ClinicalHistoryService {
 
     private final ClinicalHistoryRepository repository;
     private final PetRepository petRepository;
+    private final AppUserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
 
     public ClinicalHistoryResponse create(ClinicalHistoryRequest request) {
-        if (!petRepository.existsById(request.petId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        AppUser veterinarian = userRepository.findById(request.veterinarianId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        Appointment appointment = null;
+        if (request.appointmentId() != null) {
+            appointment = appointmentRepository.findById(request.appointmentId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
         }
 
         ClinicalHistory history = ClinicalHistory.builder()
-                .petId(request.petId())
-                .veterinarianId(request.veterinarianId())
-                .appointmentId(request.appointmentId())
+                .pet(pet)
+                .veterinarian(veterinarian)
+                .appointment(appointment)
+                .recordDate(LocalDateTime.now())
                 .diagnosis(request.diagnosis())
                 .observations(request.observations())
                 .treatment(request.treatment())
-                .recordDate(LocalDateTime.now())
                 .build();
-
         return toResponse(repository.save(history));
     }
 
@@ -46,24 +59,41 @@ public class ClinicalHistoryService {
     }
 
     public ClinicalHistoryResponse findById(Long id) {
-        return repository.findById(id)
-                .map(this::toResponse)
+        ClinicalHistory history = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado"));
+        return toResponse(history);
     }
 
-    public List<ClinicalHistoryResponse> findByPet(Long petId) {
+    public List<ClinicalHistoryResponse> findByPetId(Long petId) {
+        if (!petRepository.existsById(petId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
+        }
+
         return repository.findByPetIdOrderByRecordDateDesc(petId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public ClinicalHistoryResponse update(Long id, ClinicalHistoryRequest request) {
         ClinicalHistory history = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro clínico não encontrado"));
 
-        history.setVeterinarianId(request.veterinarianId());
-        history.setAppointmentId(request.appointmentId());
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        AppUser veterinarian = userRepository.findById(request.veterinarianId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        Appointment appointment = null;
+        if (request.appointmentId() != null) {
+            appointment = appointmentRepository.findById(request.appointmentId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
+        }
+
+        history.setPet(pet);
+        history.setVeterinarian(veterinarian);
+        history.setAppointment(appointment);
         history.setDiagnosis(request.diagnosis());
         history.setObservations(request.observations());
         history.setTreatment(request.treatment());
@@ -81,9 +111,9 @@ public class ClinicalHistoryService {
     private ClinicalHistoryResponse toResponse(ClinicalHistory history) {
         return new ClinicalHistoryResponse(
                 history.getId(),
-                history.getPetId(),
-                history.getVeterinarianId(),
-                history.getAppointmentId(),
+                history.getPet() != null ? history.getPet().getId() : null,
+                history.getVeterinarian() != null ? history.getVeterinarian().getId() : null,
+                history.getAppointment() != null ? history.getAppointment().getId() : null,
                 history.getRecordDate(),
                 history.getDiagnosis(),
                 history.getObservations(),

@@ -18,14 +18,17 @@ public class ClinicalHistory {
     @Column(name = "CLINICAL_RECORD_ID")
     private Long id;
 
-    @Column(name = "PET_ID", nullable = false)
-    private Long petId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PET_ID", nullable = false)
+    private Pet pet;
 
-    @Column(name = "VETERINARIAN_ID", nullable = false)
-    private Long veterinarianId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "VETERINARIAN_ID", nullable = false)
+    private AppUser veterinarian;
 
-    @Column(name = "APPOINTMENT_ID")
-    private Long appointmentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "APPOINTMENT_ID")
+    private Appointment appointment;
 
     @Column(name = "RECORD_DATE", nullable = false)
     private LocalDateTime recordDate;

@@ -2,7 +2,10 @@ package br.com.clyvo.vitalia.service;
 
 import br.com.clyvo.vitalia.dto.request.AppointmentRequest;
 import br.com.clyvo.vitalia.dto.response.AppointmentResponse;
+import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.entity.Appointment;
+import br.com.clyvo.vitalia.entity.Pet;
+import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +23,18 @@ public class AppointmentService {
 
     private final AppointmentRepository repository;
     private final PetRepository petRepository;
+    private final AppUserRepository userRepository;
 
     public AppointmentResponse create(AppointmentRequest request) {
-        if (!petRepository.existsById(request.petId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
-        }
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        AppUser veterinarian = userRepository.findById(request.veterinarianId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
 
         Appointment appointment = Appointment.builder()
-                .petId(request.petId())
-                .veterinarianId(request.veterinarianId())
+                .pet(pet)
+                .veterinarian(veterinarian)
                 .appointmentDate(request.appointmentDate())
                 .status(request.status() != null ? request.status() : "SCHEDULED")
                 .notes(request.notes())
@@ -45,9 +51,16 @@ public class AppointmentService {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada"));
 
+        Pet pet = petRepository.findById(request.petId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+
+        AppUser veterinarian = userRepository.findById(request.veterinarianId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Veterinário não encontrado"));
+
+        appointment.setPet(pet);
+        appointment.setVeterinarian(veterinarian);
         appointment.setAppointmentDate(request.appointmentDate());
         appointment.setNotes(request.notes());
-        appointment.setVeterinarianId(request.veterinarianId());
         if (request.status() != null) {
             appointment.setStatus(request.status());
         }
@@ -73,7 +86,7 @@ public class AppointmentService {
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!repository.existsById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consulta não encontrada");
         repository.deleteById(id);
     }
 
@@ -83,8 +96,8 @@ public class AppointmentService {
                 app.getAppointmentDate(),
                 app.getStatus(),
                 app.getNotes(),
-                app.getPetId(),
-                app.getVeterinarianId()
+                app.getPet() != null ? app.getPet().getId() : null,
+                app.getVeterinarian() != null ? app.getVeterinarian().getId() : null
         );
     }
 }

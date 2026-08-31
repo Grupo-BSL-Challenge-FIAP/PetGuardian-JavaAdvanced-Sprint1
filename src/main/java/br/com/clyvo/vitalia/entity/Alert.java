@@ -18,8 +18,9 @@ public class Alert {
     @Column(name = "ALERT_ID")
     private Long id;
 
-    @Column(name = "PET_ID", nullable = false)
-    private Long petId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PET_ID", nullable = false)
+    private Pet pet;
 
     @Column(name = "MEASUREMENT_ID")
     private Long measurementId;
