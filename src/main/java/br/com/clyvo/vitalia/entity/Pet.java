@@ -20,8 +20,9 @@ public class Pet {
     @Column(name = "PET_ID")
     private Long id;
 
-    @Column(name = "OWNER_USER_ID", nullable = false)
-    private Long ownerUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNER_USER_ID", nullable = false)
+    private AppUser owner;
 
     @Column(name = "BREED_ID")
     private Long breedId;

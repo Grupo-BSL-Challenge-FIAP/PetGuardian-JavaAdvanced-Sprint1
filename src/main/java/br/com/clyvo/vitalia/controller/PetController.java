@@ -24,9 +24,11 @@ public class PetController {
     private final PetService service;
 
     @PostMapping
-    @Operation(summary = "Cadastra um novo pet")
-    public ResponseEntity<PetResponse> create(@RequestBody @Valid PetRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+    @Operation(summary = "Cadastra um novo pet vinculado ao tutor autenticado")
+    public ResponseEntity<PetResponse> create(
+            @RequestBody @Valid PetRequest request,
+            @AuthenticationPrincipal AppUser user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request, user));
     }
 
     @GetMapping

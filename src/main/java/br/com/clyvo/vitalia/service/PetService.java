@@ -2,6 +2,7 @@ package br.com.clyvo.vitalia.service;
 
 import br.com.clyvo.vitalia.dto.request.PetRequest;
 import br.com.clyvo.vitalia.dto.response.PetResponse;
+import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,9 @@ public class PetService {
     private final PetRepository repository;
 
     @CacheEvict(value = "pets", allEntries = true)
-    public PetResponse create(PetRequest request) {
+    public PetResponse create(PetRequest request, AppUser owner) {
         Pet pet = Pet.builder()
-                .ownerUserId(request.ownerUserId())
+                .owner(owner)
                 .breedId(request.breedId())
                 .name(request.name())
                 .sex(request.sex())
@@ -90,7 +91,7 @@ public class PetService {
                 pet.getBirthDate(),
                 pet.getWeightKg(),
                 pet.getStatus(),
-                pet.getOwnerUserId(),
+                pet.getOwner() != null ? pet.getOwner().getId() : null,
                 pet.getBreedId()
         );
     }
