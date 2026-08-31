@@ -3,8 +3,6 @@ package br.com.clyvo.vitalia.service;
 import br.com.clyvo.vitalia.dto.request.AlertRequest;
 import br.com.clyvo.vitalia.dto.response.AlertResponse;
 import br.com.clyvo.vitalia.entity.Alert;
-import br.com.clyvo.vitalia.entity.Pet;
-import br.com.clyvo.vitalia.enums.AlertStatus;
 import br.com.clyvo.vitalia.repository.AlertRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +24,17 @@ public class AlertService {
     private final PetRepository petRepository;
 
     public AlertResponse create(AlertRequest request) {
-        Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
+        if (!petRepository.existsById(request.petId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado");
+        }
 
         Alert alert = Alert.builder()
-                .type(request.type())
+                .petId(request.petId())
+                .alertType(request.alertType())
                 .message(request.message())
-                .riskLevel(request.riskLevel())
-                .status(AlertStatus.OPEN)
-                .pet(pet)
+                .severity(request.severity())
+                .status(request.status() != null ? request.status() : "OPEN")
+                .createdAt(LocalDateTime.now())
                 .build();
 
         return toResponse(repository.save(alert));
@@ -61,18 +61,17 @@ public class AlertService {
         Alert alert = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alerta não encontrado"));
 
-        Pet pet = petRepository.findById(request.petId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
-
-        alert.setType(request.type());
+        alert.setAlertType(request.alertType());
         alert.setMessage(request.message());
-        alert.setRiskLevel(request.riskLevel());
-        alert.setPet(pet);
+        alert.setSeverity(request.severity());
+        alert.setPetId(request.petId());
 
-        if (request.status() == AlertStatus.RESOLVED && alert.getStatus() != AlertStatus.RESOLVED) {
+        if ("RESOLVED".equals(request.status()) && !"RESOLVED".equals(alert.getStatus())) {
             alert.setResolvedAt(LocalDateTime.now());
         }
-        alert.setStatus(request.status());
+        if (request.status() != null) {
+            alert.setStatus(request.status());
+        }
 
         return toResponse(repository.save(alert));
     }
@@ -87,13 +86,13 @@ public class AlertService {
     private AlertResponse toResponse(Alert alert) {
         return new AlertResponse(
                 alert.getId(),
-                alert.getType(),
+                alert.getAlertType(),
                 alert.getMessage(),
-                alert.getRiskLevel(),
+                alert.getSeverity(),
                 alert.getStatus(),
                 alert.getCreatedAt(),
                 alert.getResolvedAt(),
-                alert.getPet().getName()
+                alert.getPetId()
         );
     }
 }
