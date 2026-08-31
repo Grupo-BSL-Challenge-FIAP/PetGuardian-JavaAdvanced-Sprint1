@@ -9,7 +9,11 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
 
 public record AccountRequest(
-        @Schema(example = "usuario@petguardian.com")
+        @Schema(example = "Ana Silva")
+        @NotBlank(message = "O nome completo é obrigatório")
+        String fullName,
+
+        @Schema(example = "usuario@vitalia.com")
         @NotBlank(message = "O e-mail é obrigatório")
         @Email(message = "Formato de e-mail inválido")
         @Pattern(regexp = ".+@.+\\..+", message = "O e-mail deve conter um domínio válido (ex: .com)")
@@ -24,11 +28,10 @@ public record AccountRequest(
         )
         String password,
 
+        @Schema(example = "11999999999")
+        String phone,
+
         @Schema(example = "TUTOR")
         @NotNull(message = "O papel (role) do usuário é obrigatório")
-        Role role,
-
-        @Schema(example = "true")
-        @NotNull(message = "O status ativo/inativo deve ser informado")
-        Boolean active
+        Role role
 ) {}
