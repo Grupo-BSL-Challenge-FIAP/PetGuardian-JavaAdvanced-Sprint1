@@ -84,9 +84,6 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO (seção 6 do documento): cpf, dateOfBirth e address de MobileRegisterRequest
-    // ainda não são persistidos - a tabela TB_VITALIA_APP_USER não tem essas colunas.
-    // Se forem necessários, uma tabela complementar precisa ser criada pela equipe de Database.
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<Void> register(@RequestBody @Valid MobileRegisterRequest data) {
