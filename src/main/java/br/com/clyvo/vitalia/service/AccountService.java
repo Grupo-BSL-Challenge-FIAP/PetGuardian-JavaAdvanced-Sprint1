@@ -6,10 +6,12 @@ import br.com.clyvo.vitalia.dto.request.AccountRequest;
 import br.com.clyvo.vitalia.dto.response.AccountResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -19,12 +21,16 @@ public class AccountService {
     private final AccountRepository repository;
 
     public AccountResponse create(AccountRequest request) {
+        LocalDateTime now = LocalDateTime.now();
         Account account = Account.builder()
+                .fullName(request.fullName())
                 .email(request.email())
-                .password(request.password())
+                .password(new BCryptPasswordEncoder().encode(request.password()))
+                .phone(request.phone())
+                .status("ACTIVE")
                 .role(request.role())
-                .active(request.active())
-                .createdAt(LocalDateTime.now())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
         return toResponse(repository.save(account));
@@ -40,10 +46,11 @@ public class AccountService {
 
     public AccountResponse update(Long id, AccountRequest request) {
         Account account = findAccountById(id);
+        account.setFullName(request.fullName());
         account.setEmail(request.email());
-        account.setPassword(request.password());
+        account.setPhone(request.phone());
         account.setRole(request.role());
-        account.setActive(request.active());
+        account.setUpdatedAt(LocalDateTime.now());
         return toResponse(repository.save(account));
     }
 
@@ -59,9 +66,11 @@ public class AccountService {
     private AccountResponse toResponse(Account account) {
         return new AccountResponse(
                 account.getId(),
+                account.getFullName(),
                 account.getEmail(),
+                account.getPhone(),
+                account.getStatus(),
                 account.getRole(),
-                account.getActive(),
                 account.getCreatedAt()
         );
     }
