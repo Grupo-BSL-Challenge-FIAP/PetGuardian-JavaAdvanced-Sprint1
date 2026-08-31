@@ -2,7 +2,7 @@ package br.com.clyvo.vitalia.controller;
 
 import br.com.clyvo.vitalia.dto.request.PetRequest;
 import br.com.clyvo.vitalia.dto.response.PetResponse;
-import br.com.clyvo.vitalia.enums.CurrentStatus;
+import br.com.clyvo.vitalia.entity.Account;
 import br.com.clyvo.vitalia.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,9 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import br.com.clyvo.vitalia.entity.Account;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("pets")
@@ -49,20 +48,6 @@ public class PetController {
         return ResponseEntity.ok(service.findByName(name, pageable));
     }
 
-    @GetMapping("/search/species")
-    @Operation(summary = "Busca pets por espécie")
-    public ResponseEntity<Page<PetResponse>> findBySpecies(
-            @RequestParam String species, Pageable pageable) {
-        return ResponseEntity.ok(service.findBySpecies(species, pageable));
-    }
-
-    @GetMapping("/search/status")
-    @Operation(summary = "Busca pets por status de saúde (NORMAL, ATTENTION, CRITICAL)")
-    public ResponseEntity<Page<PetResponse>> findByStatus(
-            @RequestParam CurrentStatus status, Pageable pageable) {
-        return ResponseEntity.ok(service.findByStatus(status, pageable));
-    }
-
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza os dados de um pet")
     public ResponseEntity<PetResponse> update(
@@ -78,11 +63,10 @@ public class PetController {
     }
 
     @GetMapping("/my-pets")
-    @Operation(summary = "Lista todos os pets do responsável autenticado")
+    @Operation(summary = "Lista todos os pets do tutor autenticado")
     public ResponseEntity<Page<PetResponse>> findMyPets(
             @AuthenticationPrincipal Account account,
             Pageable pageable) {
         return ResponseEntity.ok(service.findMyPets(account.getId(), pageable));
     }
-
 }
