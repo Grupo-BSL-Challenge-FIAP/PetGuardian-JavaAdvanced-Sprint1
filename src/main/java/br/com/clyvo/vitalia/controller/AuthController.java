@@ -6,10 +6,8 @@ import br.com.clyvo.vitalia.dto.response.LoginResponse;
 import br.com.clyvo.vitalia.dto.response.MeResponse;
 import br.com.clyvo.vitalia.dto.request.MobileRegisterRequest;
 import br.com.clyvo.vitalia.entity.Account;
-import br.com.clyvo.vitalia.entity.Responsible;
 import br.com.clyvo.vitalia.enums.Role;
 import br.com.clyvo.vitalia.repository.AccountRepository;
-import br.com.clyvo.vitalia.repository.ResponsibleRepository;
 import br.com.clyvo.vitalia.service.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
 
 @RestController
@@ -35,10 +34,6 @@ public class AuthController {
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
-    private ResponsibleRepository responsibleRepository;
-
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
@@ -57,17 +52,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Long responsibleId = null;
-        Responsible responsible = responsibleRepository.findByAccountId(account.getId()).orElse(null);
-        if (responsible != null) {
-            responsibleId = responsible.getId();
-        }
-
         MeResponse response = new MeResponse(
                 account.getId(),
                 account.getEmail(),
-                account.getRole(),
-                responsibleId
+                account.getRole()
         );
 
         return ResponseEntity.ok(response);
@@ -80,12 +68,15 @@ public class AuthController {
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        LocalDateTime now = LocalDateTime.now();
         Account newAccount = Account.builder()
+                .fullName(data.fullName())
                 .email(data.email())
                 .password(encryptedPassword)
+                .status("ACTIVE")
                 .role(data.role())
-                .active(true)
-                .createdAt(LocalDateTime.now())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
         this.accountRepository.save(newAccount);
@@ -93,6 +84,9 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    // TODO (seção 6 do documento): cpf, dateOfBirth e address de MobileRegisterRequest
+    // ainda não são persistidos - a tabela TB_VITALIA_APP_USER não tem essas colunas.
+    // Se forem necessários, uma tabela complementar precisa ser criada pela equipe de Database.
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<Void> register(@RequestBody @Valid MobileRegisterRequest data) {
@@ -102,26 +96,19 @@ public class AuthController {
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        LocalDateTime now = LocalDateTime.now();
         Account newAccount = Account.builder()
+                .fullName(data.fullName())
                 .email(data.email())
                 .password(encryptedPassword)
-                .role(Role.RESPONSIBLE)
-                .active(true)
-                .createdAt(LocalDateTime.now())
+                .phone(data.phoneNumber())
+                .status("ACTIVE")
+                .role(Role.TUTOR)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
-        Account savedAccount = this.accountRepository.save(newAccount);
-
-        Responsible newResponsible = Responsible.builder()
-                .fullName(data.fullName())
-                .cpf(data.cpf())
-                .dateOfBirth(data.dateOfBirth())
-                .phoneNumber(data.phoneNumber())
-                .address(data.address())
-                .account(savedAccount)
-                .build();
-
-        this.responsibleRepository.save(newResponsible);
+        this.accountRepository.save(newAccount);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
