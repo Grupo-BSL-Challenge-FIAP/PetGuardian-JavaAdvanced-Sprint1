@@ -1,5 +1,6 @@
 package br.com.clyvo.vitalia.dto.request;
 
+import br.com.clyvo.vitalia.enums.CurrentStatus;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public record PetRequest(
         @Positive(message = "O peso deve ser um valor positivo")
         BigDecimal weightKg,
 
-        String status,
+        CurrentStatus status,
 
         @NotNull(message = "O ID do tutor é obrigatório")
         Long ownerUserId,

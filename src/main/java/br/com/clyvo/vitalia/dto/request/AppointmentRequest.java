@@ -1,5 +1,6 @@
 package br.com.clyvo.vitalia.dto.request;
 
+import br.com.clyvo.vitalia.enums.AppointmentStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -7,7 +8,7 @@ public record AppointmentRequest(
         @NotNull(message = "A data da consulta é obrigatória")
         LocalDateTime appointmentDate,
 
-        String status,
+        AppointmentStatus status,
 
         String notes,
 
