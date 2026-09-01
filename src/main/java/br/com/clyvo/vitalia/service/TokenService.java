@@ -24,7 +24,9 @@ public class TokenService {
             return JWT.create()
                     .withIssuer("vitalia-api")
                     .withSubject(user.getEmail())
+                    .withClaim("userId", user.getId())
                     .withClaim("roles", user.getRoles().stream().map(role -> role.getName()).toList())
+                    .withIssuedAt(Instant.now()) 
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
