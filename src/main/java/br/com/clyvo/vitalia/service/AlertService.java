@@ -32,17 +32,15 @@ public class AlertService {
 
         Alert alert = Alert.builder()
                 .pet(pet)
-                .alertType(request.alertType())
+                .alertType(request.alertType().name())
                 .message(request.message())
-                .severity(request.severity())
-                .status(request.status() != null ? request.status() : "OPEN")
+                .severity(request.severity().name())
+                .status(request.status() != null ? request.status().name() : "OPEN")
                 .createdAt(LocalDateTime.now())
                 .build();
 
         Alert savedAlert = repository.save(alert);
         AlertResponse response = toResponse(savedAlert);
-
-        // Dispara o alerta em tempo real para quem estiver conectado no canal WebSocket
         messagingTemplate.convertAndSend("/topic/alerts", response);
 
         return response;
@@ -77,15 +75,16 @@ public class AlertService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
 
         alert.setPet(pet);
-        alert.setAlertType(request.alertType());
+        alert.setAlertType(request.alertType().name());
         alert.setMessage(request.message());
-        alert.setSeverity(request.severity());
+        alert.setSeverity(request.severity().name());
 
-        if ("RESOLVED".equals(request.status()) && !"RESOLVED".equals(alert.getStatus())) {
-            alert.setResolvedAt(LocalDateTime.now());
-        }
         if (request.status() != null) {
-            alert.setStatus(request.status());
+            String statusName = request.status().name();
+            if ("RESOLVED".equals(statusName) && !"RESOLVED".equals(alert.getStatus())) {
+                alert.setResolvedAt(LocalDateTime.now());
+            }
+            alert.setStatus(statusName);
         }
 
         return toResponse(repository.save(alert));

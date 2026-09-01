@@ -38,7 +38,7 @@ public class AppointmentService {
                 .pet(pet)
                 .veterinarian(veterinarian)
                 .appointmentDate(request.appointmentDate())
-                .status(request.status() != null ? request.status() : "SCHEDULED")
+                .status(request.status() != null ? request.status().name() : "SCHEDULED")
                 .notes(request.notes())
                 .build();
 
@@ -64,7 +64,7 @@ public class AppointmentService {
         appointment.setAppointmentDate(request.appointmentDate());
         appointment.setNotes(request.notes());
         if (request.status() != null) {
-            appointment.setStatus(request.status());
+            appointment.setStatus(request.status().name());
         }
 
         return toResponse(repository.save(appointment));

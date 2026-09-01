@@ -2,18 +2,19 @@ package br.com.clyvo.vitalia.dto.request;
 
 import br.com.clyvo.vitalia.enums.AlertStatus;
 import br.com.clyvo.vitalia.enums.AlertType;
+import br.com.clyvo.vitalia.enums.RiskLevel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record AlertRequest(
-        @NotBlank(message = "O tipo do alerta é obrigatório")
+        @NotNull(message = "O tipo do alerta é obrigatório")
         AlertType alertType,
 
         @NotBlank(message = "A mensagem é obrigatória")
         String message,
 
-        @NotBlank(message = "A severidade é obrigatória")
-        String severity,
+        @NotNull(message = "A severidade é obrigatória")
+        RiskLevel severity,
 
         AlertStatus status,
 

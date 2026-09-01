@@ -31,7 +31,7 @@ public class PetService {
                 .sex(request.sex())
                 .birthDate(request.birthDate())
                 .weightKg(request.weightKg())
-                .status(request.status() != null ? request.status() : "ACTIVE")
+                .status(request.status() != null ? request.status().name() : "ACTIVE")
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -70,7 +70,7 @@ public class PetService {
         pet.setBirthDate(request.birthDate());
         pet.setWeightKg(request.weightKg());
         if (request.status() != null) {
-            pet.setStatus(request.status());
+            pet.setStatus(request.status().name());
         }
 
         return toResponse(repository.save(pet));
