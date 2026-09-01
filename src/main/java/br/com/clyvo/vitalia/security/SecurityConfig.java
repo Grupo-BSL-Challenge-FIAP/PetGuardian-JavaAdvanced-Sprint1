@@ -30,7 +30,10 @@ public class SecurityConfig {
                         // Rotas públicas
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register/tutor").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register/vet").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register/admin").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/error").permitAll()
 

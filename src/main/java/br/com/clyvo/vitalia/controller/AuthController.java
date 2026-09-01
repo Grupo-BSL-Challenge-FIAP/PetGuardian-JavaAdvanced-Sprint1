@@ -7,6 +7,7 @@ import br.com.clyvo.vitalia.dto.response.MeResponse;
 import br.com.clyvo.vitalia.dto.request.MobileRegisterRequest;
 import br.com.clyvo.vitalia.entity.AppUser;
 import br.com.clyvo.vitalia.enums.AppUserStatus;
+import br.com.clyvo.vitalia.repository.AppRoleRepository;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.service.TokenService;
 import jakarta.validation.Valid;
@@ -19,8 +20,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import br.com.clyvo.vitalia.entity.Role;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,6 +34,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final AppUserRepository appUserRepository;
+    private final AppRoleRepository appRoleRepository;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest data) {
@@ -57,32 +62,52 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/register/tutor")
+    @Transactional
+    public ResponseEntity<Void> registerTutor(@RequestBody @Valid RegisterRequest data) {
+        return registerUserWithRole(data, "TUTOR");
+    }
+
     @PostMapping("/register/vet")
+    @Transactional
     public ResponseEntity<Void> registerVet(@RequestBody @Valid RegisterRequest data) {
+        return registerUserWithRole(data, "VETERINARIAN");
+    }
+
+    @PostMapping("/register/admin")
+    @Transactional
+    public ResponseEntity<Void> registerAdmin(@RequestBody @Valid RegisterRequest data) {
+        return registerUserWithRole(data, "ADMIN");
+    }
+
+    private ResponseEntity<Void> registerUserWithRole(RegisterRequest data, String roleName) {
         if (this.appUserRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
+        var role = this.appRoleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role " + roleName + " não encontrada"));
+
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         LocalDateTime now = LocalDateTime.now();
+
         AppUser newUser = AppUser.builder()
                 .fullName(data.fullName())
                 .email(data.email())
                 .passwordHash(encryptedPassword)
                 .status(AppUserStatus.ACTIVE)
+                .roles(new HashSet<Role>(Collections.singleton(role)))
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
 
         this.appUserRepository.save(newUser);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<Void> register(@RequestBody @Valid MobileRegisterRequest data) {
-
         if (this.appUserRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
