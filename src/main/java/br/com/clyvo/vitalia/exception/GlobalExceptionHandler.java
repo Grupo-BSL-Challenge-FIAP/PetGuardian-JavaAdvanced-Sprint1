@@ -1,5 +1,6 @@
 package br.com.clyvo.vitalia.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -39,5 +40,16 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getReason() != null ? ex.getReason() : "Erro de Negócio");
 
         return ResponseEntity.status(ex.getStatusCode()).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflict");
+        body.put("message", "Registro não pode ser removido ou alterado: possui dependências ou vínculos ativos em outra tabela.");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 }
