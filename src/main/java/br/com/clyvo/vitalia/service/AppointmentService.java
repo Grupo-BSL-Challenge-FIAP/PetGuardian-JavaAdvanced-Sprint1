@@ -8,6 +8,7 @@ import br.com.clyvo.vitalia.entity.Pet;
 import br.com.clyvo.vitalia.repository.AppUserRepository;
 import br.com.clyvo.vitalia.repository.AppointmentRepository;
 import br.com.clyvo.vitalia.repository.PetRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public class AppointmentService {
     private final PetRepository petRepository;
     private final AppUserRepository userRepository;
 
+    @Transactional
     public AppointmentResponse create(AppointmentRequest request) {
         Pet pet = petRepository.findById(request.petId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet não encontrado"));
