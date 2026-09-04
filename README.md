@@ -9,7 +9,7 @@ O Vitalia é uma plataforma de monitoramento inteligente para animais de estima�
 Acesse a documentação interativa e realize testes diretamente pelo navegador:
 
 ```bash
-https://petguardian-api-p2jq.onrender.com/swagger-ui/index.html#/
+https://vitalia-txa9.onrender.com/swagger-ui/index.html#/
 ```
 ```bash
 http://localhost:8080/swagger-ui/index.html
