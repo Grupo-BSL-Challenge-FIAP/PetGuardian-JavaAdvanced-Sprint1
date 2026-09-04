@@ -1,6 +1,6 @@
-# 🐾 PetGuardian API
+# 🐾 Vitalia API
 
-O PetGuardian é uma plataforma de monitoramento inteligente para animais de estimação, integrando tutores, veterinários e dispositivos IoT para garantir a saúde e o bem-estar animal.
+O Vitalia é uma plataforma de monitoramento inteligente para animais de estimação, integrando tutores, veterinários e dispositivos IoT para garantir a saúde e o bem-estar animal.
 
 ---
 
