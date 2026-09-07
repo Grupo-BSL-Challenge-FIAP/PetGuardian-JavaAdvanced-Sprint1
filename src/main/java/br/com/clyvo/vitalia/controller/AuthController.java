@@ -112,6 +112,9 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
 
+        var tutorRole = this.appRoleRepository.findByName("TUTOR")
+                .orElseThrow(() -> new RuntimeException("Role TUTOR não encontrada"));
+
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         LocalDateTime now = LocalDateTime.now();
         AppUser newUser = AppUser.builder()
@@ -120,6 +123,7 @@ public class AuthController {
                 .passwordHash(encryptedPassword)
                 .phone(data.phoneNumber())
                 .status(AppUserStatus.ACTIVE)
+                .roles(new HashSet<Role>(Collections.singleton(tutorRole)))
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
